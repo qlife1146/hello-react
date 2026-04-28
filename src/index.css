@@ -327,7 +327,32 @@ button.new-button {
   min-width: 400px;
   padding: 10px 0;
 }
+
 .calculator > .buttons {
   display: flex;
   flex-direction: column;
+}
+
+.active {
+  background-color: #ffc75f;
+}
+
+.trend-list {
+  display: flex;
+  flex-direction: row;
+  padding-left: 0;
+  gap: 10px;
+}
+
+.trend-box > .button {
+  margin-bottom: 10px;
+}
+
+.trend-item > span {
+  display: flex;
+  flex-direction: column;
+}
+
+li {
+  list-style-type: none;
 }

@@ -3,118 +3,48 @@ import articleData from "./articles.json";
 import ArticleList from "./ArticleList";
 import ArticleWriter from "./ArticleWriter";
 import { useState } from "react";
-import ArticleNewButton from "./ArticleNewButton";
 
 const ArticleMain = () => {
-  const [cachedData, setCachedData] = useState(articleData.articles);
-  const [
-    {
-      subject,
-      membersVO: { name, email },
-      content,
-      view: viewCnt,
-      crtDt,
-    },
-    setNewData,
-  ] = useState({
-    subject: "",
-    membersVO: { name: "", email: "" },
-    content: "",
-    viewCnt: 0,
-    crtDt: "",
-  });
-  const onSubjectChangeHandler = (e) => {
-    console.log(e.target.value);
-    setNewData((prevData) => ({
-      ...prevData,
-      subject: e.target.value,
-    }));
-  };
-  const onNameChangeHandler = (e) => {
-    console.log(e.target.value);
-    setNewData((prevData) => ({
-      ...prevData,
-      membersVO: {
-        ...prevData.membersVO,
-        name: e.target.value,
-      },
-    }));
-  };
-  const onEmailChangeHandler = (e) => {
-    console.log(e.target.value);
-    setNewData((prevData) => ({
-      ...prevData,
-      membersVO: {
-        ...prevData.membersVO,
-        email: e.target.value,
-      },
-    }));
-  };
-  const onContentChangeHandler = (e) => {
-    console.log(e.target.value);
-    setNewData((prevData) => ({
-      ...prevData,
-      content: e.target.value,
-    }));
-  };
-  const onNegativeClickHandler = () => {
-    console.log("clicked negative button");
-    setNewData({
-      subject: "",
-      membersVO: {
-        name: "",
-        email: "",
-      },
-      content: "",
-    });
-    setShowWriter((prevData) => {
-      prevData = false;
-      return prevData;
-    });
-    console.log(subject + ", " + name + ", " + email + ", " + content);
-  };
-  const onPositiveClickHandler = () => {
-    const today = new Date();
-    const formattedDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")} ${today.getHours().toString().padStart(2, "0")}:${today.getMinutes().toString().padStart(2, "0")}:${today.getSeconds().toString().padStart(2, "0")}`;
-    console.log(today);
-    if (subject === "" || name === "" || email === "" || content === "") {
-      return;
-    }
+  const [articles, setArticles] = useState(articleData.articles);
 
-    setCachedData((prevData) => [
+  const onAddArticleClickHandler = (subject, name, email, content) => {
+    const lpad = (str, length, defaultCharacter) => {
+      const remainLength = length - (str + "").length;
+      return defaultCharacter.repeat(remainLength) + str;
+    };
+
+    const getDateTime = (format) => {
+      const now = new Date();
+
+      return format
+        .replaceAll("YYYY", now.getFullYear())
+        .replaceAll("MM", lpad(now.getMonth() + 1, 2, "0"))
+        .replaceAll("DD", lpad(now.getDate(), 2, "0"))
+        .replaceAll("HH", lpad(now.getHours(), 2, "0"))
+        .replaceAll("mm", lpad(now.getMinutes(), 2, "0"))
+        .replaceAll("ss", lpad(now.getSeconds(), 2, "0"));
+    };
+
+    const makeId = (index) => {
+      const seq = lpad(index, 6, "0");
+      return `BO-${getDateTime("YYYYMMDD-")}${seq}`;
+    };
+
+    setArticles((prevData) => [
       ...prevData,
       {
-        id: prevData.length,
+        id: makeId(prevData.length + 1),
         subject,
-        membersVO: {
-          name,
-          email,
-        },
         content,
-        viewCnt: 0,
-        crtDt: formattedDate,
+        email,
+        viewCnt: parseInt(Math.random() * 10000),
+        crtDt: getDateTime("YYYY-MM-DD HH:mm:ss"),
+        mdfyDt: null,
+        fileGroupId: null,
+        membersVO: { email, name },
+        files: [],
       },
     ]);
-
-    setNewData({
-      subject: "",
-      membersVO: {
-        name: "",
-        email: "",
-      },
-      content: "",
-    });
-  };
-
-  const [showWriter, setShowWriter] = useState(false);
-
-  const onNewButtonClickHandler = () => {
-    setShowWriter((prevData) => {
-      // true = show writer
-      prevData = true;
-      return prevData;
-    });
-    console.log(showWriter);
   };
 
   return (
@@ -129,24 +59,10 @@ const ArticleMain = () => {
         </colgroup>
         <ArticleHeader />
         <tbody>
-          <ArticleList
-            //  articleData={articleData.articles}
-            articleData={cachedData}
-          />
+          <ArticleList articleData={articles} />
         </tbody>
       </table>
-      {!showWriter && <ArticleNewButton onClick={onNewButtonClickHandler} />}
-      {showWriter && (
-        <ArticleWriter
-          inputData={{ subject, name, email, content, viewCnt, crtDt }}
-          onSubjectChange={onSubjectChangeHandler}
-          onNameChange={onNameChangeHandler}
-          onEmailChange={onEmailChangeHandler}
-          onContentChange={onContentChangeHandler}
-          onNegativeClick={onNegativeClickHandler}
-          onPositiveClick={onPositiveClickHandler}
-        />
-      )}
+      <ArticleWriter onAddArticleClick={onAddArticleClickHandler} />
     </div>
   );
 };
