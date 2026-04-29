@@ -1,7 +1,8 @@
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import { Alert } from "../ui/Modals";
 
-const TodoAppender = ({ onSaveButtonClick }) => {
+const TodoAppender = memo(({ onSaveButtonClick }) => {
+  console.log("todo appender");
   const today = new Date().toISOString().split("T")[0];
   const todoRef = useRef();
   const dueDateRef = useRef();
@@ -10,14 +11,6 @@ const TodoAppender = ({ onSaveButtonClick }) => {
   const alertRef = useRef();
 
   const onSaveButtonClickHandler = () => {
-    // if (
-    //   to-doRef.current.value === "" ||
-    //   dueDateRef.current.value === "" ||
-    //   priorityRef.current.value === "0"
-    // ) {
-    //   alert("내용이 없어요!");
-    //   return;
-    // }
     if (!todoRef.current.value) {
       alertRef.current.showModal("내용을");
       return;
@@ -58,6 +51,6 @@ const TodoAppender = ({ onSaveButtonClick }) => {
       </button>
     </footer>
   );
-};
+});
 
 export default TodoAppender;

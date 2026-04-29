@@ -1,8 +1,7 @@
-import ArticleWriter from "./ArticleWriter";
-const ArticleList = ({ articleData }) => {
+const ArticleList = ({ contents }) => {
   return (
     <>
-      {articleData.map((article) => (
+      {contents.map((article) => (
         <tr key={article.id}>
           <td className="article subject">{article.subject}</td>
           <td className="article content">{article.content}</td>

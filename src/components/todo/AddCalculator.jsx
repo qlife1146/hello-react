@@ -1,0 +1,47 @@
+import { useCallback, useState } from "react";
+const AddCalculator = () => {
+  const [addResult, setAddResult] = useState(0);
+  const [startNum, setStartNum] = useState(1);
+  const [endNum, setEndNum] = useState(10);
+
+  const add = useCallback(() => {
+    console.log(startNum, endNum);
+    let sum = 0;
+    for (let i = startNum; i <= endNum; i++) {
+      sum += i;
+    }
+    setAddResult(sum);
+  }, [startNum, endNum]);
+
+  return (
+    <div>
+      <input
+        type="number"
+        name=""
+        id=""
+        value={startNum}
+        onChange={(e) => {
+          setStartNum(Number(e.target.value));
+        }}
+      />{" "}
+      ~{" "}
+      <input
+        type="number"
+        name=""
+        id=""
+        value={endNum}
+        onChange={(e) => {
+          setEndNum(Number(e.target.value));
+        }}
+      />{" "}
+      = <span>{addResult}</span>
+      <div>
+        <button type="button" onClick={add}>
+          계산하기
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default AddCalculator;

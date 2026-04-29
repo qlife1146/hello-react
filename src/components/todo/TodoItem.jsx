@@ -3,13 +3,12 @@ import { Confirm } from "../ui/Modals";
 import TodoContext from "./contexts/TodoContext";
 
 const TodoItem = ({ todo, onDoneChange }) => {
+  console.log("todo item");
   const priorities = ["없음", "높음", "보통", "낮음"];
   const checkboxRef = useRef();
   const confirmRef = useRef();
 
   const { componentName } = useContext(TodoContext);
-
-  console.log("TodoGrid:" + componentName);
 
   if (!componentName || componentName !== "TodoGrid") {
     return <></>;
@@ -17,8 +16,8 @@ const TodoItem = ({ todo, onDoneChange }) => {
 
   // props todo의 이름과 todo.todo의 이름이 같이 구조 분해 불가
   // to-do.todo의 이름을 todoTask로 변경해 할당
-  const { id, todo: todoTask, dueDate, priority, isDone } = todo;
-  const doneClass = isDone ? "done" : "";
+  const { id, task, dueDate, priority, done } = todo;
+  const doneClass = done ? "done" : "";
   const onDoneChangeHandler = () => {
     const checked = checkboxRef.current.checked;
     let message = "";
@@ -32,7 +31,7 @@ const TodoItem = ({ todo, onDoneChange }) => {
   };
 
   const onConfirmOkClickHandler = () => {
-    onDoneChange(id, !isDone);
+    onDoneChange(id, !done);
   };
   const onConfirmCloseClickHandler = () => {};
 
@@ -46,12 +45,12 @@ const TodoItem = ({ todo, onDoneChange }) => {
       <input
         type="checkbox"
         // id={id}
-        checked={isDone}
+        checked={done}
         onChange={onDoneChangeHandler}
         ref={checkboxRef}
       />
-      <label className={isDone ? "done" : ""} htmlFor={id}>
-        {todoTask}
+      <label className={done ? "done" : ""} htmlFor={id}>
+        {task}
       </label>
       <span className={`due-date ${doneClass}`}>{dueDate}</span>
       <span className={`priority ${doneClass}`}>{priorities[priority]}</span>

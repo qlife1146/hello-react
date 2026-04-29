@@ -3,8 +3,8 @@ import TodoContext from "./contexts/TodoContext";
 import { useContext } from "react";
 
 const TodoList = ({ children }) => {
+  console.log("todo list");
   const { componentName } = useContext(TodoContext);
-  console.log("TodoList: " + componentName);
 
   if (!componentName || componentName !== "TodoGrid") {
     return <></>;

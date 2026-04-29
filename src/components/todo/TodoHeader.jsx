@@ -1,13 +1,12 @@
 import { useContext, useRef } from "react";
 import { Confirm } from "../ui/Modals";
 import TodoContext from "./contexts/TodoContext";
-const TodoHeader = ({ onAllDoneChange }) => {
+const TodoHeader = ({ count, onAllDoneChange }) => {
+  console.log("todo header");
   const checkboxRef = useRef();
   const confirmRef = useRef();
 
   const { componentName } = useContext(TodoContext);
-
-  console.log("TodoHeader:" + componentName);
 
   if (!componentName || componentName !== "TodoGrid") {
     return <></>;
@@ -34,6 +33,11 @@ const TodoHeader = ({ onAllDoneChange }) => {
 
   return (
     <>
+      <li className="tasks-counter">
+        <div>전체: {count.all}</div>
+        <div>진행중: {count.process}</div>
+        <div>완료: {count.done}</div>
+      </li>
       <li className="tasks-header">
         <Confirm
           confirmRef={confirmRef}

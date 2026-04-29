@@ -2,89 +2,99 @@
 // function -> 함수 호출한 대상을 this 객체로 알 수 있음
 // fat arrow function -> this 사용 불가(대신 event 파라미터 사용)
 
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { StateTest } from "./StateTest";
 import TodoAppender from "./TodoAppender";
-import TodoHeader from "./TodoHeader";
-import TodoList from "./TodoList";
-import { useState } from "react";
-import TodoItem from "./TodoItem";
 import TodoGrid from "./TodoGrid";
+import TodoHeader from "./TodoHeader";
+import TodoItem from "./TodoItem";
+import TodoList from "./TodoList";
+import AddCalculator from "./AddCalculator";
+import {
+  fetchAddTodo,
+  fetchAllDoneTodo,
+  fetchDoneTodo,
+  fetchTodoList,
+} from "../../http/todo/fetchTodo";
 
 // export default 이후 const 키워드를 쓸 수 없음
 // export default const TodoMain = () => {};
 const TodoMain = () => {
+  console.log("todo main");
   // to-do JSON DATA
-  const todoDatas = [
-    {
-      id: "todo_1",
-      todo: "React Component 마스터",
-      dueDate: "2025-04-30",
-      priority: 1,
-      isDone: true,
-    },
-    {
-      id: "todo_2",
-      todo: "React Component 마스터 2",
-      dueDate: "2026-05-05",
-      priority: 2,
-      isDone: false,
-    },
-    {
-      id: "todo_3",
-      todo: "React Component 마스터 3",
-      dueDate: "2026-05-08",
-      priority: 3,
-      isDone: false,
-    },
-  ];
 
-  const [cachedData, setCachedData] = useState(todoDatas);
-  const onAllDoneChangeHandler = (isDone) => {
-    setCachedData((prevData) => {
-      // cachedData를 반복하면서 모든 isDone의 값을 변경
-      const newData = prevData.map((todo) => ({ ...todo, isDone }));
-      // 변경된 결과는 반환
-      return newData;
-    });
+  const [cachedData, setCachedData] = useState([]);
+
+  const refreshTodoList = async () => {
+    const todoList = await fetchTodoList();
+    setCachedData(todoList.body);
+
+    if (todoList.errors) {
+      alert(todoList.errors);
+    }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshTodoList();
+  }, []);
+
+  const todoCount = useMemo(() => {
+    return {
+      all: cachedData.length,
+      // 완료 todo 개수 반환
+      done: cachedData.filter((todo) => todo.done).length,
+      // 미완료 todo 개수 반환
+      process: cachedData.filter((todo) => !todo.done).length,
+    };
+  }, [cachedData]);
+
+  const onAllDoneChangeHandler = useCallback(async () => {
+    const allDoneResult = await fetchAllDoneTodo();
+    if (!allDoneResult.errors) {
+      refreshTodoList();
+    } else {
+      alert(allDoneResult.errors);
+    }
+    refreshTodoList();
+  }, []);
 
   // 특정 todo.isDone 값을 반전시키는 함수 필요
   // props로 To-doList에게 전달
   // To-doList는 TodoItem에게 전달
   // (props) -> TodoList -> TodoItem
-  const onDoneChangeHandler = (todoId, isDone) => {
-    setCachedData((prevData) => {
-      const newStateMemory = [...prevData];
+  const onDoneChangeHandler = async (todoId) => {
+    const doneResult = await fetchDoneTodo(todoId);
+    if (!doneResult.errors) {
+      refreshTodoList();
+    } else {
+      alert(doneResult.errors);
+    }
+  };
 
-      for (const todo of newStateMemory) {
-        if (todo.id === todoId) {
-          todo.isDone = isDone;
-          break;
-        }
+  const onSaveButtonClickHandler = useCallback(
+    async (todo, dueDate, priority) => {
+      console.log("저장합니다.");
+      const addResult = await fetchAddTodo(todo, dueDate, priority);
+      if (!addResult.errors) {
+        refreshTodoList();
+      } else {
+        alert(addResult.errors);
       }
-      return newStateMemory;
-    });
-  };
-  const onSaveButtonClickHandler = (todo, dueDate, priority) => {
-    setCachedData((prevData) => [
-      ...prevData,
-      {
-        id: prevData.length,
-        todo,
-        dueDate,
-        priority: Number(priority),
-        isDone: false,
-      },
-    ]);
-    // alert("저장했습니다.");
-  };
+    },
+    [],
+  );
+
   // 컴포넌트가 만들어준 HTML Tag set 반환
   return (
     <div className="wrapper">
       {/* <StateTest /> */}
       <header>React Todo</header>
       <TodoGrid>
-        <TodoHeader onAllDoneChange={onAllDoneChangeHandler} />
+        <TodoHeader
+          count={todoCount}
+          onAllDoneChange={onAllDoneChangeHandler}
+        />
         <TodoList>
           {cachedData.map((todo) => (
             <TodoItem
