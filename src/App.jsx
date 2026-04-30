@@ -5,11 +5,11 @@ import TrendMain from "./components/trend/TrendMain.jsx";
 import { ToolkitProvider } from "./stores/toolkit/ToolkitProvider";
 // import { ReactReduxProvider } from "./stores/redux/ReactReduxProvider.jsx";
 export default function App() {
-  // <ArticleMain />;
   // return <TrendMain />;
   return (
     <ToolkitProvider>
-      <TodoMain />;
+      {/* <TodoMain />; */}
+      <ArticleMain />;
     </ToolkitProvider>
   );
   // return <CCMain />;

@@ -29,9 +29,10 @@ const ArticleWriter = ({ onAddArticleClick, errorHandleRef }) => {
   const alertRef = useRef();
 
   const [viewMode, setViewMode] = useState("button");
+  const [isFetching, setIsFetching] = useState(false);
 
   // 저장을 클릭하면 입력했던 값을 가져와 출력
-  const onSaveButtonClickHandler = () => {
+  const onSaveButtonClickHandler = async () => {
     console.log("subjectRef", subjectRef.current.value);
     console.log("contentRef", contentRef.current.value);
     console.log(alertRef);
@@ -46,11 +47,15 @@ const ArticleWriter = ({ onAddArticleClick, errorHandleRef }) => {
       return;
     }
 
-    onAddArticleClick(
+    setIsFetching(true);
+
+    await onAddArticleClick(
       subjectRef.current.value,
       contentRef.current.value,
-      attachFileRef.current.files, // value는 path를 반환
+      attachFileRef.current.files,
     );
+
+    setIsFetching(false);
 
     subjectRef.current.value = "";
     contentRef.current.value = "";
@@ -92,8 +97,9 @@ const ArticleWriter = ({ onAddArticleClick, errorHandleRef }) => {
           <button
             type="button"
             className="positive-button"
+            disabled={isFetching}
             onClick={onSaveButtonClickHandler}>
-            저장
+            {isFetching ? "저장..." : "저장"}
           </button>
           <button
             type="button"

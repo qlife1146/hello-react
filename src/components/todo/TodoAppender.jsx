@@ -33,15 +33,6 @@ const TodoAppender = memo(() => {
 
     setIsFetching(true);
 
-    // reactReduxDispatcher({
-    //   type: "todo-add",
-    //   payload: {
-    //     task: taskRef.current.value,
-    //     dueDate: dueDateRef.current.value,
-    //     priority: priorityRef.current.value,
-    //   },
-    // });
-
     const addResult = await fetchAddTodo(
       taskRef.current.value,
       dueDateRef.current.value,
