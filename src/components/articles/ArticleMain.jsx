@@ -1,13 +1,17 @@
-import { fetchArticleList } from "../../http/articles/fetchArticles";
+import {
+  fetchAddArticle,
+  fetchArticleList,
+} from "../../http/articles/fetchArticles";
 import ArticleHeader from "./ArticleHeader";
 import ArticleList from "./ArticleList";
 import ArticleWriter from "./ArticleWriter";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ArticleLogin from "./login/ArticleLogin";
 
 const ArticleMain = () => {
   const [viewPageNo, setViewPageNo] = useState(0);
   const [tokenState, setTokenState] = useState("");
+  const writeRef = useRef();
   console.log(viewPageNo);
 
   const onPaginationButtonClickHandler = (nextPageNo) => {
@@ -44,39 +48,35 @@ const ArticleMain = () => {
 
   const refreshArticleList = async () => {
     const articleList = await fetchArticleList(viewPageNo);
+    if (articleList.error) {
+      alert(articleList.error);
+    }
     const {
       result: { count, result },
       pagination,
     } = articleList;
 
     setArticles({ count, result, pagination });
-
-    if (articleList.error) {
-      alert(articleList.error);
-    }
   };
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshArticleList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewPageNo]);
 
-  const onAddArticleClickHandler = (subject, name, email, content) => {
-    setArticles((prevData) => [
-      ...prevData,
-      {
-        id: prevData.length + 1,
-        subject,
-        content,
-        email,
-        viewCnt: parseInt(Math.random() * 10000),
-        crtDt: "2026-01-01",
-        mdfyDt: null,
-        fileGroupId: null,
-        membersVO: { email, name },
-        files: [],
-      },
-    ]);
+  const onAddArticleClickHandler = async (subject, content, attachFile) => {
+    const addResult = await fetchAddArticle(
+      tokenState,
+      subject,
+      content,
+      attachFile,
+    );
+    if (addResult.error) {
+      writeRef.current.setResponseError(addResult.error);
+    } else {
+      refreshArticleList();
+    }
   };
 
   return (
@@ -104,7 +104,10 @@ const ArticleMain = () => {
             </button>
           )}
         </div>
-        <ArticleWriter onAddArticleClick={onAddArticleClickHandler} />
+        <ArticleWriter
+          onAddArticleClick={onAddArticleClickHandler}
+          errorHandleRef={writeRef}
+        />
       </div>
     </>
   );

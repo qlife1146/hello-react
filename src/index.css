@@ -146,6 +146,9 @@ button:active {
   color: #333;
   color: #fff;
 }
+button:disabled {
+  cursor: not-allowed;
+}
 
 button.confirm-ok {
   background-color: #79d8aa;
