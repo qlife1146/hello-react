@@ -22,10 +22,10 @@ export default function App() {
       setCurrentPage(getCurrentPage());
     };
 
-    window.addEventListener("hasChange", handleHashChange);
+    window.addEventListener("hashchange", handleHashChange);
 
     return () => {
-      window.removeEventListener("hasChange", handleHashChange);
+      window.removeEventListener("hashchange", handleHashChange);
     };
   }, []);
   // return <TrendMain />;
